@@ -18,7 +18,7 @@ import { Navbar } from "../components";
 
 import { NavbarActionButton, ModeChangerActionButton, NavbarDrawer } from "../components/drawer";
 
-import { selectUserInfo } from "../reducers/UserInfoSlice";
+import { selectUserInfo } from "../reducers/userInfoSlice";
 
 
 
