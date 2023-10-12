@@ -12,6 +12,8 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { selectNavbarFlag, changeNavbarFlag, makeNavbarFlagFalse } from "../../reducers/sidebarSlice";
 
+import { userInfoEmpty } from "../../reducers/userInfoSlice";
+
 
 
 
@@ -25,6 +27,12 @@ const NavbarDrawer = ({ selectedTabIndex, handleTabIndexChange }) => {
 	const navbarFlag = useSelector(selectNavbarFlag);
 	
 	const dispatch = useDispatch();
+	
+
+	const logOut = () => {
+		dispatch(userInfoEmpty());
+		navigate("/sign-in");
+	}
 	
 	
 	
@@ -79,6 +87,7 @@ const NavbarDrawer = ({ selectedTabIndex, handleTabIndexChange }) => {
 				alt="login-logout"
 				src={loginLogoutImg}
 				style={{ cursor: "pointer", margin: "0 auto", width: "3rem" }}
+				onClick={logOut}
 				/>
 			
 			</Drawer>
