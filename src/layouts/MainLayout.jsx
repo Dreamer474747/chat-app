@@ -33,7 +33,7 @@ const MainLayout = () => {
 	const navigate = useNavigate();
 	
 	
-	const pathName = window.location.href.replace("http://127.0.0.1:3000", "")
+	const pathName = window.location.href.replace("https://dreamer-chat-app.iran.liara.run", "")
 	
 	const pathNameArray = [
 		"/home-page",
