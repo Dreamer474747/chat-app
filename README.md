@@ -28,4 +28,9 @@ users dont have the ability to know if a message is seen by the other user or no
 
 the chat app does not have the feature that shows the user how many unread messages he has.
 
-the original ui 
+in the original ui, only the messages page is designed. but in the chat app i created my own home page(this page is just a simple page for greeting the user), settings page(this page displayes you're username, user id and password. but you cant change them.(feature will be added in the future)) and the create page(this page helps you to create new contacts).
+
+my chat app is responsive and its useable for all of the devices that are between 320 and 1500 px wide. but the original ui is specifically made for iPad(i mean if you open the figma page of the ui of the project, you can clearly see that it says "iPad Mockup". i guess we can call that "specifically made for iPad" but correct me if i'm wrong).
+
+
+
