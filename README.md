@@ -14,15 +14,18 @@ there is no search mechanism in the app for finding the desired contct between t
 
 the home icon and the message icon are a bit different from the original ui. and there is no bell icon. instead there is a plus icon for finding and adding new contact.
 
-for now users dont have the ability to have profile photo's. instead they will see the first letter of theire username being displayes in the place that they should have profile pictures.
+for now users dont have the ability to have profile photo's. instead they will see the first letter of theire username being displayed in the place that they should have profile pictures.
 
-users cant see whether if the contact theire talking to is online or not. they dont have the ability to phone call or video call or tap on a vertical 3 dot and choose an option.
+users cant see whether if the contact theire chatting with is online or not. they dont have the ability to phone call or video call or tap on a vertical 3 dot and choose an option.
 
 insetead of the time being displayed as today or yesterday, users see the exact time that the message has been sent. Of course, this thing is limited to the minute in which the message was sent.
 
-users dont have a specific button for choosing between an emoji or to choose a file or a media like a photo or a video. they dont have the ability to send voice messages.
+users dont have a specific button for choosing between an emoji or to choose a file or a media like a photo or a video(the app also dont have the feature to send a file or a media like a photo or a video). the app also dont have the feature to send voice messages.
+
 there is an icon in the left side of the chat box. i dont know what that icon is supposed to do but we dont have that too.
 
-users dont have the ability to know if a message is seen by the other user or not. in the original ui, the chat app is supposed to have this feature in the section we see the contacts but no in the chat interface(the place where the messages get displayed).
+users dont have the ability to know if a message is seen by the other user or not(also the chat app does not have the feature so that the user know whether the message he tried to send has been really sent or not). in the original ui, the chat app is supposed to have this feature in the section we see the contacts but not in the chat interface(the place where the messages get displayed).
 
+the chat app does not have the feature that shows the user how many unread messages he has.
 
+the original ui 
