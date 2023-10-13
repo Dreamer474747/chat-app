@@ -2,4 +2,4 @@
 
 
 ## Credit
-[link to the figma page of the ui of the project](https://www.figma.com/file/srvACKvYxpOfOFguNqFROs/Chatting-app-UI-dark-mode-(Community)?type=design&node-id=301-156&mode=design&t=jjODDxxeaXeCGQMW-0)
+[link to the figma page of the ui of the project](https://www.figma.com/community/file/998085369059570685)
