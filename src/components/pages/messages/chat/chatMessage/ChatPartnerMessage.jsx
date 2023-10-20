@@ -4,10 +4,7 @@ import { Box, Typography } from "@mui/material";
 //import oneTick from "../../../../../../public/svgs/oneTick.svg";
 //import twoTickUnseen from "../../../../../../public/svgs/twoTickUnseen.svg";
 
-import { formatDistanceToNow, format } from "date-fns";
-import { enUS } from "date-fns/locale";
-import { utcToZonedTime } from "date-fns-tz";
-
+import { timeConverter } from "../../../../../helpers";
 
 
 
@@ -18,19 +15,7 @@ import { utcToZonedTime } from "date-fns-tz";
 
 const ChatPartnerMessage = ({children, time, msgId}) => {
 	
-	const monthes = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ]
-	
-	const timeZone = "Asia/Tehran";
-	const zonedDate = utcToZonedTime(new Date(time), timeZone)
-	
-	const currentMonth = zonedDate.getMonth();
-	const currentDayOfTheMonth = zonedDate.getDate();
-	
-	const formattedTime = format(zonedDate, "hh:mma");
-	const formattedDate = `${currentDayOfTheMonth} ${monthes[currentMonth]}, ${formattedTime}`;
-	
-	
-	
+	const formattedDate = timeConverter(time);
 	
 	
 	

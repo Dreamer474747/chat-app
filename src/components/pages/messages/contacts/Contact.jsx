@@ -8,13 +8,9 @@ import { Box, Typography, Avatar, Divider } from "@mui/material";
 
 import EllipsisText from "react-ellipsis-text";
 
-import { formatDistanceToNow, format } from "date-fns";
-import { enUS } from "date-fns/locale";
-import { utcToZonedTime } from "date-fns-tz";
-
 import {
 useLazyGetChatMessagesQuery,
-Messagescollected,
+messagesCollected,
 selectLastMessages
 } from "../../../../reducers/chatSlice";
 import { useLazyGetUserQuery } from "../../../../reducers/authSlice";
@@ -22,10 +18,10 @@ import { useLazyGetUserQuery } from "../../../../reducers/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectUserInfo } from "../../../../reducers/userInfoSlice";
-
 import { makeContactsFlagFalse } from "../../../../reducers/sidebarSlice";
-
 import { setChatPartnerInfo } from "../../../../reducers/chatPartnerInfoSlice";
+
+import { timeConverter, colorPicker } from "../../../../helpers";
 
 import toast from 'react-hot-toast';
 
@@ -40,19 +36,12 @@ const Contact = ({ chatPairDetails, index }) => {
 	
 	const dispatch = useDispatch();
 	const [getUser] = useLazyGetUserQuery();
+	const [getChatMessages] = useLazyGetChatMessagesQuery();
 	
 	
 	const { id: userId } = useSelector(selectUserInfo);
 	
-	const { id: chatKey, chatPartnersIds } = chatPairDetails; 
-	
-	const allLastMessages = useSelector(selectLastMessages);
-	
-	
-	const lastMessage = allLastMessages.find(lastM => lastM.id === chatKey);
-	
-	
-	const { text, time: utcDate } = lastMessage.lastText;
+	const { id: chatKey, chatPartnersIds } = chatPairDetails;
 	
 	const [otherChatPartnerName, setOtherChatPartnerName] = useState("");
 	
@@ -67,6 +56,10 @@ const Contact = ({ chatPairDetails, index }) => {
 			
 			const { data: otherChatPartnerInfo } = await getUser(otherChatPartnerId);
 			setOtherChatPartnerName(otherChatPartnerInfo.username)
+			// we only get the id the both chat partners and extract the other chat partner but we dont get the
+			// name of the other chat partner. thats why we have to get the info of the other chat partner so we
+			// can have the name of the other chat partner. change the backEnd some how so we no longer need to 
+			// get the info of the other chat partner.
 			
 		}
 		
@@ -75,63 +68,36 @@ const Contact = ({ chatPairDetails, index }) => {
 	}, [])
 	
 	
-	
-	
-	
-	const colors = [
-		"#00c853",
-		"#03a9f4",
-		"#3f51b5",
-		"#009688",
-		"#00b0ff",
-		"#1de9b6",
-		"#00e676",
-		"#ffc400",
-		"#00bcd4",
-		"#ffab00"
-	]
-	
-	const colorPicker = index => {
-		if (index < 9) {
-			return colors[index];
-		} else if (index > 9 && index < 18) {
-			return colors[index - 9];
-		} else {
-			return colors[index - 18];
-		}
-	}
-	
-	
-	
-	
-	
-	
-	const monthes = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ]
-	
-	const timeZone = "Asia/Tehran";
-	const zonedDate = utcToZonedTime(new Date(utcDate), timeZone)
-	
-	const currentMonth = zonedDate.getMonth();
-	const currentDayOfTheMonth = zonedDate.getDate();
-	
-	const formattedTime = format(zonedDate, "hh:mma");
-	const formattedDate = `${(currentDayOfTheMonth)} ${monthes[currentMonth]}, ${formattedTime}`;
-	
-	
-	const [getChatMessages] = useLazyGetChatMessagesQuery();
-	
-	const messageCollector = async chatPlaceId => {
-		const { data } = await getChatMessages(chatPlaceId);
-		
-		dispatch(Messagescollected(data));
-	}
-	
-	
 	const chatPartner = {
 		chatPartnerName: otherChatPartnerName,
 		chatKey,
 		chatPartnerId: otherChatPartnerId
 	}
+	
+	
+	
+	
+	
+	
+	const allLastMessages = useSelector(selectLastMessages);
+	
+	const lastMessage = allLastMessages.find(lastM => lastM.id === chatKey);
+	const { text, time } = lastMessage.lastText;
+	
+	const formattedDate = timeConverter(time);
+	
+	
+	
+	
+	
+	const messageCollector = async chatPlaceId => {
+		const { data: allTheMessagesOfTheCurrentChatAndItsId } = await getChatMessages(chatPlaceId);
+		
+		dispatch(messagesCollected(allTheMessagesOfTheCurrentChatAndItsId));
+	}
+	
+	
+	
 	
 
 	

@@ -7,9 +7,20 @@ import ChatPartnerMessage from "./chatMessage/ChatPartnerMessage";
 
 import { useSelector, useDispatch } from "react-redux";
 
-import { selectCollectedMessages } from "../../../../reducers/chatSlice";
+import {
+selectCollectedMessages,
+useLazyGetChatMessagesQuery,
+messagesCollected,
+lastMessagesCollected,
+selectLastMessages
+} from "../../../../reducers/chatSlice";
 
 import { selectUserInfo } from "../../../../reducers/userInfoSlice";
+
+import { selectChatPartnerInfo } from "../../../../reducers/chatPartnerInfoSlice";
+
+import { lastMessagesUpdater } from "../../../../helpers";
+
 
 
 
@@ -20,19 +31,52 @@ import { selectUserInfo } from "../../../../reducers/userInfoSlice";
 
 const ChatInterface = () => {
 	
-	let chatMessages = useSelector(selectCollectedMessages);
+	const dispatch = useDispatch();
+	
+	const allLastMessages = useSelector(selectLastMessages);
+	let { messages: allCurrentMessages } = useSelector(selectCollectedMessages);
+	
 	
 	const { id: userId } = useSelector(selectUserInfo);
 	
-	//Array.isArray(chatMessages) is to determine whether the chatMessages variable is populated with value or not.
+	//Array.isArray(allCurrentMessages) is to determine whether the allCurrentMessages variable is populated with value or not.
+	
+	
+	const { chatKey: currentChatChatKey } = useSelector(selectChatPartnerInfo);
+	const [getChatMessages] = useLazyGetChatMessagesQuery();
+	
+	
+	useEffect(() => {
+		
+		let messageUpdaterTimer;
+		
+		if (currentChatChatKey) {
+			
+			messageUpdaterTimer = setInterval(async () => {
+				
+				const { data: allMessagesAndTheirId } = await getChatMessages(currentChatChatKey);
+				dispatch(messagesCollected(allMessagesAndTheirId));
+				
+				
+				const allLastMessagesUpdated = lastMessagesUpdater(currentChatChatKey, allMessagesAndTheirId, allLastMessages);
+				
+				dispatch(lastMessagesCollected(allLastMessagesUpdated))
+				
+			}, 10000)
+		}
+		
+		
+		return () => clearInterval(messageUpdaterTimer);
+		
+	
+	}, [currentChatChatKey])
+	
 	
 	const chatContactRef = useRef(null);
 	
 	useEffect(() => {
 		chatContactRef.current.scrollTop = chatContactRef.current.scrollHeight;
-	}, [chatMessages])
-	
-	
+	}, [allCurrentMessages])
 	
 	
 	
@@ -50,7 +94,7 @@ const ChatInterface = () => {
 			>
 			
 			{
-				Array.isArray(chatMessages.messages)? chatMessages.messages.map((msg, index) => (
+				Array.isArray(allCurrentMessages)? allCurrentMessages.map((msg, index) => (
 					msg.senderId === userId? (<UserMessage msgId={msg.id} time={msg.time} key={index}> {msg.text} </UserMessage>) :
 					(<ChatPartnerMessage msgId={msg.id} time={msg.time} key={index}> {msg.text} </ChatPartnerMessage>)
 				)) :
@@ -81,6 +125,10 @@ const ChatInterface = () => {
 }
 
 export default ChatInterface;
+
+
+
+
 
 
 

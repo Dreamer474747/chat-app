@@ -13,7 +13,7 @@ import {
 selectCollectedMessages,
 useAddNewMessageMutation,
 useEditChatPartnerPairMutation,
-Messagescollected,
+messagesCollected,
 lastMessagesCollected,
 selectLastMessages
 } from "../../../../reducers/chatSlice";
@@ -33,7 +33,7 @@ const ChatBox = () => {
 	const [editChatPartnerPair] = useEditChatPartnerPairMutation();
 	
 	const allLastMessages = useSelector(selectLastMessages);
-	const allMessagesAndTheChatId = useSelector(selectCollectedMessages);
+	const allMessagesAndTheirChatId = useSelector(selectCollectedMessages);
 	
 	
 	const { chatKey, chatPartnerName, chatPartnerId } = useSelector(selectChatPartnerInfo);
@@ -46,14 +46,13 @@ const ChatBox = () => {
 		setInputValue("");
 	}, [chatKey])
 	
-	
-	
 	const [inputValue, setInputValue] = useState("");
-	
 	
 	const onInputValueChange = (e) => {
 		setInputValue(e.target.value);
 	}
+	
+	
 	
 	
 	const sendMessage = () => {
@@ -62,7 +61,7 @@ const ChatBox = () => {
 		}
 		else if (inputValue.trim()) {
 			const newMessage = {
-				id: allMessagesAndTheChatId.messages.length + 1,
+				id: allMessagesAndTheirChatId.messages.length + 1,
 				senderId: userId,
 				senderUsername: username,
 				isSeen: true,
@@ -70,13 +69,13 @@ const ChatBox = () => {
 				time: new Date().toISOString(),
 			}
 			
-			const newMessagesToBeSent = {
-				...allMessagesAndTheChatId,
-				messages: [ ...allMessagesAndTheChatId.messages, newMessage ]
+			const allMessagesIncludingTheNewMessage = {
+				...allMessagesAndTheirChatId,
+				messages: [ ...allMessagesAndTheirChatId.messages, newMessage ]
 			}
 			
-			addNewMessage(newMessagesToBeSent);
-			dispatch(Messagescollected(newMessagesToBeSent));
+			addNewMessage(allMessagesIncludingTheNewMessage);
+			dispatch(messagesCollected(allMessagesIncludingTheNewMessage));
 			setInputValue("");
 			
 			const newChatPair = {

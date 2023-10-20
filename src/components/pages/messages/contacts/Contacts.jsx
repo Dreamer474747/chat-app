@@ -28,7 +28,9 @@ const Contacts = () => {
 	const { chatKey, id: userId } = useSelector(selectUserInfo);
 	
 	
-	const [getChatPartnerPair] = useLazyGetChatPartnerPairQuery();
+	const [getChatPartnerPair, { isFetching }] = useLazyGetChatPartnerPairQuery();
+	
+	
 	
 	const [allchatPairs, setAllchatPairs] = useState([]);
 	
@@ -42,14 +44,12 @@ const Contacts = () => {
 				
 				helperSet.add(chatPartnerPair)
 				
-				
-				
 			}
 			setAllchatPairs([...helperSet])
 			
-			const helperObject = Object.values({...[...helperSet]});
+			const allLastMessages = Object.values({...[...helperSet]});
 			
-			dispatch(lastMessagesCollected(helperObject));
+			dispatch(lastMessagesCollected(allLastMessages));
 			
 			
 		}
@@ -131,7 +131,7 @@ const Contacts = () => {
 										textAlign: "center"
 									}}
 									>
-										select the plus icon and find a contact
+										select the plus icon from the navbar and find a contact
 									</Typography>
 								</Box>
 							)

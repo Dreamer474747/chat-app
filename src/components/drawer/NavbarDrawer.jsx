@@ -2,37 +2,35 @@ import { useNavigate } from "react-router-dom";
 
 import { Drawer, Box, Tabs, Tab } from "@mui/material/";
 
-import { useState } from "react";
-
-import TabsDataArray from "../../constants/TabsData";
-
-import loginLogoutImg from "../../../public/svgs/logout-login.svg";
-
 import { useSelector, useDispatch } from "react-redux";
 
+import TabsDataArray from "../../constants/TabsData";
+import loginLogoutImg from "../../../public/svgs/logout-login.svg";
+
 import { selectNavbarFlag, changeNavbarFlag, makeNavbarFlagFalse } from "../../reducers/sidebarSlice";
-
 import { userInfoEmpty } from "../../reducers/userInfoSlice";
-
 
 
 
 
 const NavbarDrawer = ({ selectedTabIndex, handleTabIndexChange }) => {
 	
+	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	
 	const tabsData = TabsDataArray();
 	
 	const navbarFlag = useSelector(selectNavbarFlag);
 	
-	const dispatch = useDispatch();
 	
-
+	
+	
+	
 	const logOut = () => {
 		dispatch(userInfoEmpty());
 		navigate("/sign-in");
 	}
+	
 	
 	
 	

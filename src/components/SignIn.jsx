@@ -100,6 +100,7 @@ const SignUp = () => {
 				
 				
 				<Formik
+				enableReinitialize={false}
 				initialValues={{ id: "", password: "" }}
 				validationSchema={signInSchema}
 				onSubmit={(values) => {

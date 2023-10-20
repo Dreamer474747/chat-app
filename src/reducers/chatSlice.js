@@ -45,7 +45,7 @@ export const chatSlice = createSlice({
 		lastMessages: {}
 	},
 	reducers: {
-		Messagescollected: (state, action) => {
+		messagesCollected: (state, action) => {
 			state.messages = action.payload;
 		},
 		deleteCollectedMessages: state => {
@@ -62,7 +62,7 @@ export const chatSlice = createSlice({
 
 
 export const {
-Messagescollected,
+messagesCollected,
 deleteCollectedMessages,
 lastMessagesCollected
 } = chatSlice.actions;

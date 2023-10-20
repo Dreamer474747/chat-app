@@ -62,6 +62,7 @@ const Create = () => {
 		}
 		
 		const resultArray = allOtherUsers.filter(item => !existingContacts.has(item));
+		//resultArray === the value that the allOtherNotConnectedUsers should have.
 		
 		setAllOtherNotConnectedUsers(resultArray)
 	}, [])
@@ -137,7 +138,7 @@ const Create = () => {
 		}
 		
 		
-		const notConnectedUsersUpdated = allOtherNotConnectedUsers.filter((item) => item.id !== user.id);
+		const notConnectedUsersUpdated = allOtherNotConnectedUsers.filter(notConnectedUser => notConnectedUser.id !== user.id);
 		
 		try {
 			await editUser(newUserInfo).unwrap();
@@ -147,9 +148,10 @@ const Create = () => {
 			
 			await createNewChatPartnerPair(newChatPartnerPairs).unwrap();
 			
-			toast.success("new contact was successfully created", {style: {fontFamily: "PoppinsMedium"}})
+			toast.success(`you said hello to ${otherUserNewData.username}`, {style: {fontFamily: "PoppinsMedium"}})
 			
 			setAllOtherNotConnectedUsers(notConnectedUsersUpdated);
+			setAllResultUsers([]);
 			
 			dispatch(userInfoChanged(newUserInfo))
 		} catch(err) {
@@ -202,7 +204,7 @@ const Create = () => {
 						cursor: "pointer"
 					}}
 					>
-						sey "hello" to {user.id}
+						sey "hello" to {user.username} (id: {user.id})
 					</Typography>
 				
 				))
