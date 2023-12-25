@@ -1,0 +1,421 @@
+{
+  "users": [
+    {
+      "username": "hamed",
+      "id": "hamed11",
+      "password": "1234567"
+    },
+    {
+      "username": "reza",
+      "id": "reza101",
+      "password": "1234567"
+    },
+    {
+      "username": "mobin",
+      "id": "mobin71",
+      "password": "1234567"
+    },
+    {
+      "username": "nima",
+      "id": "nima771",
+      "password": "1234567"
+    },
+    {
+      "username": "nima",
+      "id": "dreamer3",
+      "password": "0911977"
+    },
+    {
+      "username": "saeid",
+      "id": "fffffff",
+      "password": "1234567",
+      "isLogin": false
+    },
+    {
+      "username": "arman",
+      "id": "ddddddd",
+      "password": "1234567",
+      "isLogin": false
+    },
+    {
+      "username": "erfan",
+      "id": "eeeeeee",
+      "password": "1234567",
+      "isLogin": false
+    }
+  ],
+  "rooms": [
+    {
+      "id": "theRoom",
+      "members": [
+        {
+          "name": "mobin",
+          "id": "mobin71"
+        },
+        {
+          "name": "reza",
+          "id": "reza101"
+        }
+      ],
+      "lastMessage": {
+        "senderUsername": "mobin",
+        "text": "ba\"e\"",
+        "time": "2023-12-24T19:22:14.691Z"
+      }
+    },
+    {
+      "id": "outcast",
+      "members": [
+        {
+          "name": "mobin",
+          "id": "mobin71"
+        },
+        {
+          "name": "nima",
+          "id": "nima771"
+        }
+      ],
+      "lastMessage": {
+        "senderUsername": "mobin",
+        "text": "ho",
+        "time": "2023-12-24T19:22:45.047Z"
+      }
+    },
+    {
+      "id": "Lfr1h74corOQxxtO6P38Y",
+      "members": [
+        {
+          "name": "saeid",
+          "id": "fffffff"
+        },
+        {
+          "name": "nima",
+          "id": "nima771"
+        }
+      ],
+      "lastMessage": {
+        "senderUsername": "saeid",
+        "text": "hello nima",
+        "time": "2023-12-25T08:43:28.871Z"
+      }
+    },
+    {
+      "id": "zgJu2cFHMj0jc42EqDMd1",
+      "members": [
+        {
+          "name": "saeid",
+          "id": "fffffff"
+        },
+        {
+          "name": "reza",
+          "id": "reza101"
+        }
+      ],
+      "lastMessage": {
+        "senderUsername": "saeid",
+        "text": "hello reza",
+        "time": "2023-12-25T08:43:59.325Z"
+      }
+    },
+    {
+      "id": "4LqRwRgNEZ99x9HVg0yId",
+      "members": [
+        {
+          "name": "saeid",
+          "id": "fffffff"
+        },
+        {
+          "name": "arman",
+          "id": "ddddddd"
+        }
+      ],
+      "lastMessage": {
+        "senderUsername": "saeid",
+        "text": "hello arman",
+        "time": "2023-12-25T11:50:03.424Z"
+      }
+    },
+    {
+      "id": "55YPE1onAPCcr8gl8mCSn",
+      "members": [
+        {
+          "name": "erfan",
+          "id": "eeeeeee"
+        },
+        {
+          "name": "saeid",
+          "id": "fffffff"
+        }
+      ],
+      "lastMessage": {
+        "senderUsername": "erfan",
+        "text": "hello saeid",
+        "time": "2023-12-25T12:03:18.932Z"
+      }
+    },
+    {
+      "id": "-kEKPDU-P9HJZ-2AIcdid",
+      "members": [
+        {
+          "name": "erfan",
+          "id": "eeeeeee"
+        },
+        {
+          "name": "nima",
+          "id": "nima771"
+        }
+      ],
+      "lastMessage": {
+        "senderUsername": "erfan",
+        "text": "r",
+        "time": "2023-12-25T12:30:49.360Z"
+      }
+    },
+    {
+      "id": "fDyNgQBgl7lKSNxJoxO4U",
+      "members": [
+        {
+          "name": "erfan",
+          "id": "eeeeeee"
+        },
+        {
+          "name": "nima",
+          "id": "dreamer3"
+        }
+      ],
+      "lastMessage": {
+        "senderUsername": "erfan",
+        "text": "hello nima",
+        "time": "2023-12-25T12:15:13.251Z"
+      }
+    },
+    {
+      "id": "jP3Br1z-QSQYSLqeixoWj",
+      "members": [
+        {
+          "name": "erfan",
+          "id": "eeeeeee"
+        },
+        {
+          "name": "arman",
+          "id": "ddddddd"
+        }
+      ],
+      "lastMessage": {
+        "senderUsername": "erfan",
+        "text": "hello arman",
+        "time": "2023-12-25T12:15:57.998Z"
+      }
+    },
+    {
+      "id": "-AwpCXqvyVYvI0DOo4iPx",
+      "members": [
+        {
+          "name": "erfan",
+          "id": "eeeeeee"
+        },
+        {
+          "name": "reza",
+          "id": "reza101"
+        }
+      ],
+      "lastMessage": {
+        "senderUsername": "erfan",
+        "text": "hello reza",
+        "time": "2023-12-25T12:16:50.524Z"
+      }
+    }
+  ],
+  "messages": [
+    {
+      "id": "theRoom",
+      "messages": [
+        {
+          "senderId": "reza101",
+          "senderUsername": "reza",
+          "isSeen": true,
+          "text": "l",
+          "time": "2023-12-24T19:21:08.184Z"
+        },
+        {
+          "senderId": "mobin71",
+          "senderUsername": "mobin",
+          "isSeen": true,
+          "text": "ba\"e\"",
+          "time": "2023-12-24T19:22:14.691Z"
+        }
+      ]
+    },
+    {
+      "id": "outcast",
+      "messages": [
+        {
+          "senderId": "nima771",
+          "senderUsername": "nima",
+          "isSeen": true,
+          "text": "kif",
+          "time": "2023-12-24T19:21:40.859Z"
+        },
+        {
+          "senderId": "mobin71",
+          "senderUsername": "mobin",
+          "isSeen": true,
+          "text": "ho",
+          "time": "2023-12-24T19:22:45.047Z"
+        }
+      ]
+    },
+    {
+      "id": "Lfr1h74corOQxxtO6P38Y",
+      "messages": [
+        {
+          "senderId": "fffffff",
+          "senderUsername": "saeid",
+          "isSeen": true,
+          "text": "hello nima",
+          "time": "2023-12-25T08:43:28.871Z"
+        }
+      ]
+    },
+    {
+      "id": "zgJu2cFHMj0jc42EqDMd1",
+      "messages": [
+        {
+          "senderId": "fffffff",
+          "senderUsername": "saeid",
+          "isSeen": true,
+          "text": "hello reza",
+          "time": "2023-12-25T08:43:59.325Z"
+        }
+      ]
+    },
+    {
+      "id": "4LqRwRgNEZ99x9HVg0yId",
+      "messages": [
+        {
+          "senderId": "fffffff",
+          "senderUsername": "saeid",
+          "isSeen": true,
+          "text": "hello arman",
+          "time": "2023-12-25T11:50:03.424Z"
+        }
+      ]
+    },
+    {
+      "id": "55YPE1onAPCcr8gl8mCSn",
+      "messages": [
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "hello saeid",
+          "time": "2023-12-25T12:03:18.932Z"
+        }
+      ]
+    },
+    {
+      "id": "-kEKPDU-P9HJZ-2AIcdid",
+      "messages": [
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "hello nima",
+          "time": "2023-12-25T12:04:19.972Z"
+        },
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "bitch",
+          "time": "2023-12-25T12:18:42.273Z"
+        },
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "tir",
+          "time": "2023-12-25T12:28:52.312Z"
+        },
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "tir",
+          "time": "2023-12-25T12:29:34.378Z"
+        },
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "uio",
+          "time": "2023-12-25T12:29:49.359Z"
+        },
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "pppp",
+          "time": "2023-12-25T12:30:03.891Z"
+        },
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "mobin",
+          "time": "2023-12-25T12:30:29.009Z"
+        },
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "e",
+          "time": "2023-12-25T12:30:40.909Z"
+        },
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "r",
+          "time": "2023-12-25T12:30:49.360Z"
+        }
+      ]
+    },
+    {
+      "id": "fDyNgQBgl7lKSNxJoxO4U",
+      "messages": [
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "hello nima",
+          "time": "2023-12-25T12:15:13.251Z"
+        }
+      ]
+    },
+    {
+      "id": "jP3Br1z-QSQYSLqeixoWj",
+      "messages": [
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "hello arman",
+          "time": "2023-12-25T12:15:57.998Z"
+        }
+      ]
+    },
+    {
+      "id": "-AwpCXqvyVYvI0DOo4iPx",
+      "messages": [
+        {
+          "senderId": "eeeeeee",
+          "senderUsername": "erfan",
+          "isSeen": true,
+          "text": "hello reza",
+          "time": "2023-12-25T12:16:50.524Z"
+        }
+      ]
+    }
+  ]
+}
