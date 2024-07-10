@@ -2,6 +2,7 @@ import connectToDB from "db";
 import UserModel from "@/models/User";
 import GroupModel from "@/models/Group";
 import GroupMessageModel from "@/models/GroupMessage";
+import GroupInboxModel from "@/models/GroupInbox";
 
 import { isValidObjectId } from "mongoose";
 import { authUser } from "u/serverHelpers";
@@ -23,60 +24,64 @@ export async function PUT(req: Request, { params }: ParamsType) {
 			{ status: 401 });
 		}
 		
-		// 'params.id' is a group's _id. is it valid?
-		const isValid = isValidObjectId(params.id);
+		const groupId = params.id;
+		
+		// 'groupId' is a group's _id. is it valid?
+		const isValid = isValidObjectId(groupId);
 		if (!isValid) {
 			return Response.json({message: "invalid data !!"},
 			{status: 422});
 		}
 		
-		// 'params.id' is a group's _id. does this group exist in our database?
-		const isExist = await GroupModel.findOne({ _id: params.id });
+		// does this group exist in our database?
+		const isExist = await GroupModel.findOne({ _id: groupId });
 		if (!isExist) {
 			return Response.json({message: "group does not exist"},
 			{status: 404});
 		}
 		
 		
-		const joinUserInGroup = await UserModel.findOneAndUpdate(
-			{ _id: user._id },
-			{
-				$push: {
-					groups: params.id
-				}
-			}
-		);
+		const userInfo: any = await UserModel.findOne({ _id: user._id }, "name -_id");
 		
-		if (joinUserInGroup) {
+		const newGroupMessage = await GroupMessageModel.create({
+			body: `${userInfo.name} joined the group`,
+			sender: user._id,
+			isSeen: false,
+			isSystemMessage: true,
+			group: groupId,
+		});
+		
+		
+		if (newGroupMessage) {
 			
-			const userInfo: any = await UserModel.findOne({ _id: user._id }, "name -_id");
-			
-			const newGroupMessage = await GroupMessageModel.create({
-				body: `${userInfo.name} joined the group`,
-				sender: user._id,
-				isSeen: true,
-				isSystemMessage: true,
-				group: params.id,
+			// creating a new inbox for the user who wants to join the group
+			const newInbox = await GroupInboxModel.create({
+				user: user._id,
+				group: groupId,
+				lastSeenMessage: newGroupMessage._id
 			});
 			
-			const changeGroupLastMessage = await GroupModel.findOneAndUpdate(
-				{ _id: params.id },
+			// change group's lastMessage field to the most recent message
+			// that has been sent to the group
+			await GroupModel.findOneAndUpdate(
+				{ _id: groupId },
 				{
 					lastMessage: `${userInfo.name} joined the group`,
 					lastMessageDate: newGroupMessage.createdAt
 				}
 			);
 			
-			const groupInfo = await GroupModel.findOne({ _id: params.id });
+			const newGroupChat = await GroupModel.findOne({ _id: groupId });
 			const lastMessage: MessageType = {
 				_id: newGroupMessage._id,
 				body: `${userInfo.name} joined the group`,
 				createdAt: newGroupMessage.createdAt,
 				sender: user._id,
+				isSeen: false,
 				isSystemMessage: true
 			}
 			
-			return Response.json({ groupInfo, lastMessage }, { status: 201 });
+			return Response.json({ newGroupChat, lastMessage, newInbox }, { status: 201 });
 			
 		} else {
 			

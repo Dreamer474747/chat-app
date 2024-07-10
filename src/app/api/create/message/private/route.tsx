@@ -1,7 +1,7 @@
 import connectToDB from "db";
-import UserModel from "@/models/User";
 import PrivateModel from "@/models/Private";
 import PrivateMessageModel from "@/models/PrivateMessage";
+import PrivateInboxModel from "@/models/PrivateInbox";
 
 import { isValidObjectId } from "mongoose";
 import { authUser } from "u/serverHelpers";
@@ -49,13 +49,18 @@ export async function POST(req: Request) {
 		const message = await PrivateMessageModel.create({
 			body,
 			sender: user._id,
-			isSeen: true,
+			isSeen: false,
 			private: privateId,
 		})
 		
+		await PrivateInboxModel.findOneAndUpdate(
+			{ user: user._id, private: privateId },
+			{ lastSeenMessage: message._id }
+		);
+		
 		// updating the lastMessage field of this private conversation(which the value of its _id is
-		// 'privateId') to the most recent message that has been sent to this conversation.(which is
-		// the 'body')
+		// 'privateId') to the most recent message that has been sent to this conversation(which is
+		// the 'body').
 		await PrivateModel.findOneAndUpdate(
 			{ _id: privateId },
 			{ lastMessage: body, lastMessageDate: message.createdAt }
@@ -68,7 +73,7 @@ export async function POST(req: Request) {
 			sender: message.sender,
 		}
 		
-		return Response.json({lastMessage}, {status: 201});
+		return Response.json({ lastMessage }, {status: 201});
 		
 		
 	} catch(err) {

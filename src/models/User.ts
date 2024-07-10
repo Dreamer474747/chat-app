@@ -1,8 +1,5 @@
 import mongoose from "mongoose";
 
-require("./Channel");
-require("./Group");
-require("./Private");
 
 
 const schema = new mongoose.Schema({
@@ -29,30 +26,30 @@ const schema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	channels: {
-		type: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: "Channel",
-			},
-		],
-	},
-	groups: {
-		type: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: "Group",
-			},
-		],
-	},
-	privates: {
-		type: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: "Private",
-			},
-		],
-	},
+	//channels: {
+	//	type: [
+	//		{
+	//			type: mongoose.Schema.Types.ObjectId,
+	//			ref: "Channel",
+	//		},
+	//	],
+	//},
+	//groupInboxes: {
+	//	type: [
+	//		{
+	//			type: mongoose.Schema.Types.ObjectId,
+	//			ref: "GroupInbox",
+	//		},
+	//	],
+	//},
+	//privateInboxes: {
+	//	type: [
+	//		{
+	//			type: mongoose.Schema.Types.ObjectId,
+	//			ref: "PrivateInbox",
+	//		},
+	//	],
+	//},
 })
 
 

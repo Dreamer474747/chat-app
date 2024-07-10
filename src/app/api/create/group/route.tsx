@@ -1,5 +1,5 @@
 import connectToDB from "db";
-import UserModel from "@/models/User";
+import GroupInboxModel from "@/models/GroupInbox";
 import GroupModel from "@/models/Group";
 import GroupMessageModel from "@/models/GroupMessage";
 
@@ -61,20 +61,20 @@ export async function POST(req: Request) {
 			const message = await GroupMessageModel.create({
 				body: "Group created",
 				sender: user._id,
-				isSeen: true,
+				isSeen: true, // who cares if a system message is seen or not?
 				isSystemMessage: true,
 				group: newGroup._id,
 				createdAt: newGroup.lastMessageDate
 			})
 			
-			const updateUserGroups = await UserModel.findOneAndUpdate({ _id: user._id },
-			{
-				$push: {
-					groups: newGroup._id
-				}
+			// create the inbox of the group for the first member of it(the owner)
+			const newInbox = await GroupInboxModel.create({
+				user: user._id,
+				group: newGroup._id,
+				lastSeenMessage: message._id
 			})
 			
-			return Response.json({newGroup}, {status: 201});
+			return Response.json({ newGroup, newInbox }, {status: 201});
 			
 		
 		} else {

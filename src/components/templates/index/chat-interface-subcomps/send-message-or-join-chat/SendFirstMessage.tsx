@@ -1,15 +1,21 @@
 "use client";
 import { useContext, useState } from "react";
 
-import { CurrentChatContext } from "c/CurrentChatProvider";
+import { CurrentChatStatusContext } from "c/CurrentChatStatusProvider";
 import { WebsocketContext } from "c/WebsocketProvider";
+import { AllChatsAndInboxesContext } from "c/AllChatsAndInboxesProvider";
 
 import { Button } from "ui/Button";
 import { Input } from "ui/Input";
 
 import type {
-CurrentChatContextType,
+CurrentChatStatusContextType,
 WebsocketContextType,
+AllChatsAndInboxesContextType,
+GroupType,
+PrivateType,
+GroupInbox,
+PrivateInbox,
 MessageType } from "u/types";
 
 import { showSwal } from "u/helpers";
@@ -22,8 +28,11 @@ const SendFirstMessage = () => {
 	
 	const { socket } = useContext(WebsocketContext) as WebsocketContextType;
 	
-	const { newChatmate, updateRole, updateChatId, updateChatmateId
-	} = useContext(CurrentChatContext) as CurrentChatContextType;
+	const { newChatmate, setRole, setChatId, setNewChatmate
+	} = useContext(CurrentChatStatusContext) as CurrentChatStatusContextType;
+	
+	const { setAllChatRooms, setAllInboxes
+	} = useContext(AllChatsAndInboxesContext) as AllChatsAndInboxesContextType;
 	
 	
 	const [message, setMessage] = useState("");
@@ -43,16 +52,18 @@ const SendFirstMessage = () => {
 			body: JSON.stringify({ newChatmate , message })
 		})
 		
-		
-		const { newInbox } = await res.json();
-		
 		if (res.status === 201) {
-			socket.emit("createNewChat", newInbox);
 			
-			updateRole("USER");
-			updateChatId(newInbox._id);
-			updateChatmateId("");
-			showSwal("we just sent the first message", "success", "ok")
+			const { newChatRoom, userNewInbox } = await res.json();
+			
+			setAllChatRooms((prev: (GroupType | PrivateType)[]) => [ newChatRoom, ...prev ]);
+			setAllInboxes((prevInboxes: (GroupInbox | PrivateInbox)[]) => [ userNewInbox, ...prevInboxes ]);
+			
+			socket.emit("createNewChatRoom", newChatRoom);
+			
+			setRole("USER");
+			setChatId(newChatRoom._id);
+			setNewChatmate("");
 			
 		} else if (res.status === 500) {
 			showSwal("there was a problem, try again", "error", "ok")

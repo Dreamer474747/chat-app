@@ -1,7 +1,7 @@
-type MessageParamsType = {
-	body: string,
-	createdAt: string
-}
+"use client"
+import { useRef, useEffect } from "react";
+
+import { Tick, DoubleTick } from "m/icons";
 
 type OptionsType = {
 	hour: "2-digit" | "numeric" | undefined,
@@ -9,15 +9,21 @@ type OptionsType = {
 	hour12: boolean,
 }
 
+type MessageParamsType = {
+	body: string,
+	createdAt: string,
+	seen: boolean
+}
 
-const UserMessage = ({ body, createdAt }: MessageParamsType) => {
-	
+
+const UserMessage = ({ body, createdAt, seen }: MessageParamsType) => {
 	
 	const options: OptionsType = {
 		hour: "2-digit",
 		minute: "2-digit",
 		hour12: false,
 	}
+	
 	
 	
 	return (
@@ -35,6 +41,10 @@ const UserMessage = ({ body, createdAt }: MessageParamsType) => {
 					>
 						{body}
 					</p>
+					
+					<div className="absolute -bottom-0.5 right-2">
+						{ seen ? <DoubleTick /> : <Tick /> }
+					</div>
 				
 				</div>
 

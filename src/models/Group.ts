@@ -43,12 +43,6 @@ const schema = new mongoose.Schema({
 	},
 })
 
-schema.virtual("messages", {
-	ref: "GroupMessage",
-	localField: "_id",
-	foreignField: "group"
-})
-
 
 const model = mongoose.models?.Group || mongoose.model("Group", schema);
 

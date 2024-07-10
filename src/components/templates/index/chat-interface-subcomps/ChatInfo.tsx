@@ -1,8 +1,8 @@
 "use client";
 import { useContext } from "react";
 
-import { CurrentChatContext } from "c/CurrentChatProvider";
-import { CurrentChatContextType } from "u/types";
+import { CurrentChatStatusContext } from "c/CurrentChatStatusProvider";
+import { CurrentChatStatusContextType } from "u/types";
 
 import { Avatar, AvatarFallback } from "ui/Avatar";
 
@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from "ui/Avatar";
 
 const ChatInfo = () => {
 	
-	const { name } = useContext(CurrentChatContext) as CurrentChatContextType;
+	const { name } = useContext(CurrentChatStatusContext) as CurrentChatStatusContextType;
 	
 	
 	return (

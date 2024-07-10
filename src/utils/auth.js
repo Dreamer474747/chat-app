@@ -15,7 +15,7 @@ const verifyPassword = async (password, hashedPassword) => {
 
 const createAccessToken = (data) => {
   const token = sign({ ...data }, process.env.AccessTokenSecretKey, {
-    expiresIn: "1000000s",
+    expiresIn: "100d",
   });
   return token;
 };

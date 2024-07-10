@@ -34,7 +34,10 @@ export async function POST(req: Request) {
 			{status: 422});
 		}
 		
-		const messages = await PrivateMessageModel.find({ private: chatId },"-__v -updatedAt -private -isSeen");
+		const messages = await PrivateMessageModel.find(
+			{ private: chatId },
+			"-__v -updatedAt -private"
+		)
 		
 		if (messages) {
 			return Response.json({ messages });

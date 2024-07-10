@@ -2,7 +2,15 @@
 import { useState, useContext, useEffect } from "react";
 
 import { WebsocketContext } from "c/WebsocketProvider";
-import type { WebsocketContextType } from "u/types";
+import { AllChatsAndInboxesContext } from "c/AllChatsAndInboxesProvider";
+
+import type {
+WebsocketContextType,
+GroupType,
+PrivateType,
+GroupInbox,
+PrivateInbox,
+AllChatsAndInboxesContextType } from "u/types";
 
 import { useToast } from "ui/useToast";
 import { idRegex } from "u/constants";
@@ -25,6 +33,9 @@ import { Label } from "ui/Label"
 const Create = () => {
 	
 	const { socket } = useContext(WebsocketContext) as WebsocketContextType;
+	const { setAllChatRooms, setAllInboxes
+	} = useContext(AllChatsAndInboxesContext) as AllChatsAndInboxesContextType;
+	
 	const { toast } = useToast();
 	
 	const [open, setOpen] = useState(false);
@@ -100,8 +111,12 @@ const Create = () => {
 		
 		if (res.status === 201) {
 			
-			const { newGroup } = await res.json();
-			socket.emit("createNewChat", newGroup);
+			const { newGroup, newInbox } = await res.json();
+			
+			setAllChatRooms((prev: (GroupType | PrivateType)[]) => [ newGroup, ...prev ]);
+			setAllInboxes((prevInboxes: (GroupInbox | PrivateInbox)[]) => [ newInbox, ...prevInboxes ]);
+			
+			socket.emit("createNewChatRoom", newGroup);
 			
 			setOpen(false);
 			toast({

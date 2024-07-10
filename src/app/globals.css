@@ -10,7 +10,7 @@
 	height: calc(100vh - 130px);
 }
 
-.c-blue-bg {
+.selected-contact-bg {
 	background-color: #404040 !important;
 }
 

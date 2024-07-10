@@ -1,8 +1,8 @@
 "use client";
 import { useState, useContext, useEffect } from "react";
 
-import { CurrentChatContext } from "c/CurrentChatProvider";
-import type { CurrentChatContextType, SearchResult } from "u/types";
+import { CurrentChatStatusContext } from "c/CurrentChatStatusProvider";
+import type { CurrentChatStatusContextType, SearchResult } from "u/types";
 
 import { Button } from "ui/Button";
 import {
@@ -31,8 +31,8 @@ const Search = () => {
 	
 	const { toast } = useToast();
 	
-	const { updateName, updateRole, updateChatId, updateChatType, updateChatmateId
-	} = useContext(CurrentChatContext) as CurrentChatContextType;
+	const { setName, setRole, setChatId, setChatType, setNewChatmate
+	} = useContext(CurrentChatStatusContext) as CurrentChatStatusContextType;
 	
 	const [target, setTarget] = useState("user");
 	const [open, setOpen] = useState(false);
@@ -64,8 +64,8 @@ const Search = () => {
 			return toast({
 				variant: "destructive",
 				title: "id is not valid",
-				description: `an id can only have "_", "-" or "." as a special character and an id cant
-				be started with a number and it cant have spaces`,
+				description: `an id can only have "_", "-" or "." as a special character and
+				an id cant be started with a number and it cant have spaces`,
 			})
 		}
 		
@@ -86,7 +86,7 @@ const Search = () => {
 			toast({
 				variant: "destructive",
 				title: `there were some ${target} ids similar to the given id, but you already
-				${ target === "user" ? "had those users as a contact" : "were a member of those groups" }`
+				${ target === "user" ? "had those users as a contact" : "were a member of those groups. OR probebly this group does not exist." }`
 			})
 			
 		} else if (res.status === 500) {
@@ -103,20 +103,20 @@ const Search = () => {
 	const openChatPage = (_id: string, name: string) => {
 		// '_id' in here is either a user's _id or a group chat's _id.
 		// 'name' in here is either a group chat's name or a chat partner's name.
-		updateRole("OBSERVER");
-		updateName(name);
+		setRole("OBSERVER");
+		setName(name);
 		
 		if (target === "user") {
 			// if target is "user", then '_id' is a user's _id.
-			updateChatType("private");
-			updateChatId("");
-			updateChatmateId(_id);
+			setChatType("private");
+			setChatId("");
+			setNewChatmate(_id);
 		
 		} else { // target === "group"
 			// if target is "group", then '_id' is a group chat's _id.
-			updateChatType("group");
-			updateChatId(_id);
-			updateChatmateId("");
+			setChatType("group");
+			setChatId(_id);
+			setNewChatmate("");
 		}
 		
 		setOpen(false);

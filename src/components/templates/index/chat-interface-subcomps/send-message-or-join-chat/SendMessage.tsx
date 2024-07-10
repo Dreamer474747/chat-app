@@ -1,26 +1,35 @@
 "use client";
 import { useContext, useState, useEffect, Dispatch, SetStateAction } from "react";
 
-import { CurrentChatContext } from "c/CurrentChatProvider";
+import { CurrentChatStatusContext } from "c/CurrentChatStatusProvider";
 import { WebsocketContext } from "c/WebsocketProvider";
+import { AllChatsAndInboxesContext } from "c/AllChatsAndInboxesProvider";
 
 import { Button } from "ui/Button";
 import { Input } from "ui/Input";
 
-import type { CurrentChatContextType, MessageType, WebsocketContextType } from "u/types";
+import type {
+CurrentChatStatusContextType,
+MessageType,
+AllChatsAndInboxesContextType,
+WebsocketContextType } from "u/types";
 
 import { showSwal } from "u/helpers";
 
 
+// setMessages: Dispatch<SetStateAction<MessageType[]>>,
+// maybe i use this later... idk though
 type SendMessageParams = {
-	setMessages: Dispatch<SetStateAction<MessageType[]>>
+	setLastSeenMessageId: Dispatch<SetStateAction<string>>
 }
 
 
-const SendMessage = ({ setMessages }: SendMessageParams) => {
+const SendMessage = ({ setLastSeenMessageId }: SendMessageParams) => {
 	
-	const { chatId, chatType } = useContext(CurrentChatContext) as CurrentChatContextType;
+	const { chatId, chatType } = useContext(CurrentChatStatusContext) as CurrentChatStatusContextType;
 	const { socket } = useContext(WebsocketContext) as WebsocketContextType;
+	const { allInboxes, setAllInboxes } = useContext(AllChatsAndInboxesContext) as any;
+	
 	const [message, setMessage] = useState("");
 	
 	
@@ -44,6 +53,24 @@ const SendMessage = ({ setMessages }: SendMessageParams) => {
 		
 		if (res.status === 201) {
 			socket.emit("message", lastMessage, chatId);
+			
+			if (chatType === "group") {
+				const updatedInboxIndex = allInboxes.findIndex((inbox: any) => inbox?.group === chatId);
+				let helper = [...allInboxes];
+				
+				helper[updatedInboxIndex].lastSeenMessage = lastMessage._id;
+				setAllInboxes(helper);
+				
+			} else {
+				
+				const updatedInboxIndex = allInboxes.findIndex((inbox: any) => inbox?.private === chatId);
+				let helper = [...allInboxes];
+				
+				helper[updatedInboxIndex].lastSeenMessage = lastMessage._id;
+				setAllInboxes(helper);
+			}
+			
+			setLastSeenMessageId(lastMessage._id);
 			
 			setMessage("");
 		

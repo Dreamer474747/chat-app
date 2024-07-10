@@ -9,8 +9,9 @@ import { cn } from "@/lib/utils"
 const PoppinsMedium = localFont({ src: "../../public/fonts/Poppins-Medium.ttf" })
 
 
-import CurrentChatProvider from "@/components/contexts/CurrentChatProvider";
+import CurrentChatStatusProvider from "@/components/contexts/CurrentChatStatusProvider";
 import WebsocketProvider from "@/components/contexts/WebsocketProvider";
+import AllChatsAndInboxesProvider from "@/components/contexts/AllChatsAndInboxesProvider";
 
 import { Toaster } from "ui/Toaster"
 
@@ -33,11 +34,13 @@ export default function RootLayout({
 					PoppinsMedium.className
 				)}
 			>
-				<CurrentChatProvider>
+				<CurrentChatStatusProvider>
 					<WebsocketProvider>
-						{children}
+						<AllChatsAndInboxesProvider>
+							{children}
+						</AllChatsAndInboxesProvider>
 					</WebsocketProvider>
-				</CurrentChatProvider>
+				</CurrentChatStatusProvider>
 				<Toaster />
 			</body>
 		</html>

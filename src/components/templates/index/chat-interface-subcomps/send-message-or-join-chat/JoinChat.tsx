@@ -4,10 +4,18 @@ import { Button } from "ui/Button";
 import { showSwal } from "u/helpers";
 import { useRouter } from "next/navigation";
 
-import { CurrentChatContext } from "c/CurrentChatProvider";
+import { CurrentChatStatusContext } from "c/CurrentChatStatusProvider";
 import { WebsocketContext } from "c/WebsocketProvider";
+import { AllChatsAndInboxesContext } from "c/AllChatsAndInboxesProvider";
 
-import type { CurrentChatContextType, WebsocketContextType } from "u/types";
+import type {
+CurrentChatStatusContextType,
+GroupType,
+PrivateType,
+GroupInbox,
+PrivateInbox,
+AllChatsAndInboxesContextType,
+WebsocketContextType } from "u/types";
 
 
 
@@ -16,7 +24,9 @@ const JoinChat = () => {
 	
 	const router = useRouter();
 	
-	const { chatId, chatType, updateRole } = useContext(CurrentChatContext) as CurrentChatContextType;
+	const { setAllChatRooms, setAllInboxes
+	} = useContext(AllChatsAndInboxesContext) as AllChatsAndInboxesContextType;
+	const { chatId, chatType, setRole } = useContext(CurrentChatStatusContext) as CurrentChatStatusContextType;
 	const { socket } = useContext(WebsocketContext) as WebsocketContextType;
 	
 	
@@ -24,17 +34,17 @@ const JoinChat = () => {
 	useEffect(() => {
 		
 		if (socket) {
-			socket.emit("joinChat", chatId);
+			socket.emit("joinChatRoom", chatId);
 		}
 		console.log(33, cutConnection)
 		
 		return () => {
 			console.log(36, cutConnection)
 			if (cutConnection) {
-				socket.emit("leaveChat", chatId);
+				socket.emit("leaveChatRoom", chatId);
 				
 			} else {
-				socket.emit("joinChat", chatId);
+				socket.emit("joinChatRoom", chatId);
 			}
 		}
 		
@@ -54,11 +64,15 @@ const JoinChat = () => {
 		if (res.status === 201) {
 			setCutConnection(false);
 			
-			const { groupInfo, lastMessage } = await res.json();
-			socket.emit("createNewChat", groupInfo);
-			socket.emit("message", lastMessage, groupInfo._id);
+			const { newGroupChat, lastMessage, newInbox } = await res.json();
 			
-			updateRole("USER");
+			setAllChatRooms((prev: (GroupType | PrivateType)[]) => [ newGroupChat, ...prev ]);
+			setAllInboxes((prevInboxes: (GroupInbox | PrivateInbox)[]) => [ newInbox, ...prevInboxes ]);
+			
+			socket.emit("createNewChatRoom", newGroupChat);
+			socket.emit("message", lastMessage, newGroupChat._id);
+			
+			setRole("USER");
 			router.refresh();
 			
 		} else if (res.status === 404) {

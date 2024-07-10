@@ -9,7 +9,7 @@ const connectToDB = async () => {
 			return false;
 		} else {
 			
-			await mongoose.connect("mongodb://127.0.0.1:27017/chat-app");
+			await mongoose.connect(`${process.env.MongoDB_URL}/chat-app`, { authSource: "admin" });
 			console.log("connected to chat-app DB successfully :))");
 		}
 		

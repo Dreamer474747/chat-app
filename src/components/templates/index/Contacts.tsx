@@ -6,105 +6,104 @@ import { ToggleGroup, ToggleGroupItem } from "ui/ToggleGroup";
 import { ScrollArea } from "ui/ScrollArea";
 import { Separator } from "ui/Separator";
 
-import { CurrentChatContext } from "c/CurrentChatProvider";
+import { CurrentChatStatusContext } from "c/CurrentChatStatusProvider";
 import { WebsocketContext } from "c/WebsocketProvider";
-
+import { AllChatsAndInboxesContext } from "c/AllChatsAndInboxesProvider";
 
 
 import type {
 GroupType,
 PrivateType,
-CurrentChatContextType,
+CurrentChatStatusContextType,
 WebsocketContextType,
+AllChatsAndInboxesContextType,
 MessageType } from "u/types";
 
 type ContactsParams = {
-	sortedInboxes: (GroupType | PrivateType)[],
 	userId: string,
 	isForDialog: boolean
 }
 
 
 
-
-
-const Contacts = ({ sortedInboxes, userId, isForDialog }: ContactsParams) => {
+const Contacts = ({ userId, isForDialog }: ContactsParams) => {
 	
-	const { updateName, updateRole, updateChatId, updateChatType, updateChatmateId, chatId
-	} = useContext(CurrentChatContext) as CurrentChatContextType;
+	const { setName, setRole, setChatId, setChatType, chatId
+	} = useContext(CurrentChatStatusContext) as CurrentChatStatusContextType;
 	
-	const [allInboxes, setAllInboxes] = useState<(GroupType | PrivateType)[]>(sortedInboxes);
+	const { allChatRooms, setAllChatRooms, chatRoomsWithUnreadMessages
+	} = useContext(AllChatsAndInboxesContext) as AllChatsAndInboxesContextType;
+	
 	
 	// chat === room || chatId === roomId
 	
-	const allInboxIds = allInboxes.map(inbox => inbox._id);
-	// 'allInboxIds' includes all the _id of all the chats(conversations) that the user has
-	// to be joined in them in order to get the messages of that chat(conversations) through
+	const allChatIds = allChatRooms.map(chat => chat._id);
+	// 'allChatIds' includes all the _id of all the chats(conversations) that the user has
+	// to be joined in them in order to get the messages of that chat(conversation) through
 	// the websocket.
 	const { socket } = useContext(WebsocketContext) as WebsocketContextType;
 	
 	useEffect(() => {
 		
-		const receiveMessage = (message: MessageType, roomId: string) => {
+		const receiveNewMessage = (message: MessageType, roomId: string) => {
 			
-			const updatedInboxes = allInboxes.map(inbox => {
-				if (inbox._id === roomId) {
+			const updatedChatRooms = allChatRooms.map(chat => {
+				if (chat._id === roomId) {
 					return {
-						...inbox,
+						...chat,
 						lastMessage: message.body,
 						lastMessageDate: message.createdAt
 					};
 				} else {
-					return inbox;
+					return chat;
 				}
 			});
 		
-			const sortedInboxes = updatedInboxes.sort((a: any, b: any) => {
+			const sortedChatRooms = updatedChatRooms.sort((a: any, b: any) => {
 				return new Date(b.lastMessageDate).toISOString().localeCompare(new Date(a.lastMessageDate).toISOString())
 			});
 		
-			setAllInboxes(sortedInboxes);
+			setAllChatRooms(sortedChatRooms);
 		}
 		
 		
-		const receiveInbox = (inbox: GroupType | PrivateType) => {
+		const receiveNewChatRoom = (chatRoom: GroupType | PrivateType) => {
+			// check out Search.tsx and SendFirstMessage.tsx to find out what happens
+			// when "chatRoom.type" is 0(private conversation).
 			
-			setAllInboxes(prev => [ inbox, ...prev ]);
-			
-			
-			if (inbox.type === 1) { // "inbox.type === 1" is true if the 'newInbox' is a group chat.
+			if (chatRoom.type === 1) { // "chatRoom.type === 1" is true if the 'chatRoom' is a group chat.
 				
-				updateChatId(inbox._id);
-				updateName(inbox.name);
-				updateChatType("group");
+				setChatId(chatRoom._id);
+				setName(chatRoom.name);
+				setChatType("group");
 				
-				const isAdmin = inbox.admins.length > 0 && inbox.admins.some((id) => id === userId);
+				const isAdmin = chatRoom.admins.length > 0 && chatRoom.admins.some(id => id === userId);
 				if (isAdmin) {
-					updateRole("ADMIN");
+					setRole("ADMIN");
 					
-				} else if (userId === inbox.owner) {
-					updateRole("OWNER");
+				} else if (userId === chatRoom.owner) {
+					setRole("OWNER");
 					
 				} else {
-					updateRole("USER");
+					setRole("USER");
 				}
 			}
 		}
 		
 		if (socket) {
-			socket.emit("joinUserInThisRooms", allInboxIds);
+			socket.emit("joinUserInThisChatRooms", allChatIds);
 			
-			socket.on("message", receiveMessage);
-			socket.on("newInbox", receiveInbox);
+			socket.on("message", receiveNewMessage);
+			socket.on("newChatRoom", receiveNewChatRoom);
 		}
 		
 		return () => {
-			socket?.off("newInbox", receiveInbox);
-			socket?.off("message", receiveMessage);
+			socket?.off("message", receiveNewMessage);
+			socket?.off("newChatRoom", receiveNewChatRoom);
 		};
 		
 		
-	}, [socket, allInboxes])
+	}, [socket, allChatRooms])
 	
 	
 	
@@ -112,11 +111,11 @@ const Contacts = ({ sortedInboxes, userId, isForDialog }: ContactsParams) => {
 	
 	const findChatmateName = (chatId: string): string => {
 		/*
-		'allInboxes' array stores the information of all of the private chats of the user.
+		'allChatRooms' array stores the information of all of the private chats of the user.
 		
-		in the 'chatId' parameter, the value of _id of a private inbox is stored. with the help of the
-		chatId parameter, we can find the full information of our private chat from the 'allInboxes' array.
-		which we store that information in the privateChatInfo constant.
+		in the 'chatId' parameter, the value of _id of a private chat is stored. with the
+		help of the chatId parameter, we can find the full information of our private chat from
+		the 'allChatRooms' array. which we store that information in the privateChatInfo constant.
 		
 		privateChatInfo includes the 'chatmates' field. which is an array of objects and
 		each object contains the '_id' and 'name' field of one of the chat partners. we have
@@ -124,7 +123,7 @@ const Contacts = ({ sortedInboxes, userId, isForDialog }: ContactsParams) => {
 		*/
 		
 		
-		const privateChatInfo = allInboxes.find(privateChat => privateChat._id === chatId) as PrivateType;
+		const privateChatInfo = allChatRooms.find(privateChat => privateChat._id === chatId) as PrivateType;
 		
 		const chatPartnerName = privateChatInfo.chatmates.find((chatmate) => chatmate._id !== userId)?.name as string
 		return chatPartnerName;
@@ -134,28 +133,28 @@ const Contacts = ({ sortedInboxes, userId, isForDialog }: ContactsParams) => {
 	
 	const selectChat = (chatId: string) => {
 		
-		updateChatId(chatId);
-		const chatInfo = allInboxes.find((inbox) => inbox._id === chatId) as (GroupType | PrivateType);
+		setChatId(chatId);
+		const chatInfo = allChatRooms.find((chat) => chat._id === chatId) as (GroupType | PrivateType);
 		
-		// type of an "inbox" is 0 if its a private chat. and 1 if its a group chat.
+		// type of an "chat" is 0 if its a private chat. and 1 if its a group chat.
 		if (chatInfo.type === 0) {
-			updateName(findChatmateName(chatId));
-			updateChatType("private");
-			updateRole("USER");
+			setName(findChatmateName(chatId));
+			setChatType("private");
+			setRole("USER");
 		
 		} else {
-			updateName(chatInfo.name);
-			updateChatType("group");
+			setName(chatInfo.name);
+			setChatType("group");
 			
 			const isAdmin = chatInfo.admins.length > 0 && chatInfo.admins.some((id) => id === userId);
 			if (isAdmin) {
-				updateRole("ADMIN");
+				setRole("ADMIN");
 				
 			} else if (userId === chatInfo.owner) { // 'owner' === _id of a user
-				updateRole("OWNER");
+				setRole("OWNER");
 				
 			} else {
-				updateRole("USER");
+				setRole("USER");
 			}
 		}
 	}
@@ -175,44 +174,60 @@ const Contacts = ({ sortedInboxes, userId, isForDialog }: ContactsParams) => {
 					className="block"
 					type="single"
 				>
-				{/*type of an "inbox" is 0 if its a private chat. and 1 if its a group chat.*/}
+				{/*type of an "chat" is 0 if its a private chat. and 1 if its a group chat.*/}
 				{
-					allInboxes.map((inbox : (GroupType | PrivateType)) => (
-						<ToggleGroupItem
-							key={inbox._id}
-							value={inbox.type === 1 ? inbox.name : findChatmateName(inbox._id)}
-							aria-label={`Toggle ${inbox.type === 1 ? inbox.name : findChatmateName(inbox._id)}`}
-							disabled={chatId === inbox._id}
-							className={`max-h-[300px] w-full justify-start p-2 py-6 rounded-none
-							${chatId === inbox._id && "c-blue-bg"} hover:bg-primary`}
-							onClick={() => selectChat(inbox._id)}
-						>
-							
-							<div className="flex justify-start gap-2 items-center text-slate-100">
-								
-								<Avatar
-									className="flex-shrink-0"
-								>
-									<AvatarFallback className="avatar">
-										{ inbox.type === 1 ? inbox.name[0] :
-										findChatmateName(inbox._id)[0] }
-									</AvatarFallback>
-								</Avatar>
-								
-								<div className="flex flex-col items-start">
-									<span className="text-sm">
-										{inbox.type === 1 ? inbox.name : findChatmateName(inbox._id)}
-									</span>
-									<span
-										className="text-tiny text-default-400"
-									>
-										{inbox.lastMessage.slice(0, 12)}
-									</span>
-								</div>
+					allChatRooms.length === 0 ? (
+							<div
+								className={`text-white text-center px-3 flex items-center justify-center
+								${isForDialog ? "h-[80vh]" : "h-[90vh]"}`}
+							>
+								<p>search for a user or a group...</p>
 							</div>
-							
-						</ToggleGroupItem>
-					))
+						) : (
+						allChatRooms.map((chat : (GroupType | PrivateType)) => (
+							<ToggleGroupItem
+								key={chat._id}
+								value={chat.type === 1 ? chat.name : findChatmateName(chat._id)}
+								aria-label={`Toggle ${chat.type === 1 ? chat.name : findChatmateName(chat._id)}`}
+								disabled={chatId === chat._id}
+								className={`max-h-[300px] w-full justify-start p-2 py-6 rounded-none relative
+								${chatId === chat._id && "selected-contact-bg"} hover:bg-primary`}
+								onClick={() => selectChat(chat._id)}
+							>
+								
+								<div className="flex justify-start gap-2 items-center text-slate-100">
+									
+									<Avatar
+										className="flex-shrink-0"
+									>
+										<AvatarFallback className="avatar">
+											{ chat.type === 1 ? chat.name[0] :
+											findChatmateName(chat._id)[0] }
+										</AvatarFallback>
+									</Avatar>
+									
+									<div className="flex flex-col items-start">
+										<span className="text-sm">
+											{chat.type === 1 ? chat.name : findChatmateName(chat._id)}
+										</span>
+										<span
+											className="text-tiny text-default-400"
+										>
+											{chat.lastMessage.slice(0, 12)}
+										</span>
+									</div>
+									
+								</div>
+								{
+									chatRoomsWithUnreadMessages.length > 0 && 
+									chatRoomsWithUnreadMessages.some(chatRoomId => chatRoomId === chat._id ) && (
+										<div className="bg-[#708090] w-2 h-[10px] absolute top-[9px] right-2 rounded-full"></div>
+									)
+								}
+								
+							</ToggleGroupItem>
+						))
+					)
 				}
 				</ToggleGroup>
 				

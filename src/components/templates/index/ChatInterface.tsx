@@ -7,20 +7,65 @@ SendMessage,
 SendFirstMessage,
 JoinChat } from "./chat-interface-subcomps/send-message-or-join-chat";
 
-import { CurrentChatContext } from "c/CurrentChatProvider";
-import type { CurrentChatContextType, MessageType } from "u/types";
+import { CurrentChatStatusContext } from "c/CurrentChatStatusProvider";
+import { AllChatsAndInboxesContext } from "c/AllChatsAndInboxesProvider";
+import type {
+CurrentChatStatusContextType,
+AllChatsAndInboxesContextType,
+MessageType,
+GroupType,
+PrivateType,
+GroupInbox,
+PrivateInbox
+} from "u/types";
 
 
+type ChatInterfaceParams = {
+	userId: string,
+	userChatRooms: (GroupType | PrivateType)[],
+	userInboxes: (GroupInbox | PrivateInbox)[]
+}
 
 
-const ChatInterface = ({ userId }: { userId: string }) => {
+const ChatInterface = ({ userId, userChatRooms, userInboxes }: ChatInterfaceParams) => {
 	
-	const { role, newChatmate, chatId, chatType } = useContext(CurrentChatContext) as CurrentChatContextType;
+	const { role, newChatmate, chatId, chatType
+	} = useContext(CurrentChatStatusContext) as CurrentChatStatusContextType;
+	
+	const { setAllChatRooms, setAllInboxes, setChatRoomsWithUnreadMessages, allInboxes,
+	} = useContext(AllChatsAndInboxesContext) as AllChatsAndInboxesContextType;
+	
+	useEffect(() => {
+		
+		setAllChatRooms(userChatRooms);
+		setAllInboxes(userInboxes);
+	}, [])
+	
+	useEffect(() => {
+		
+		const getUnreadChatRooms = async () => {
+			
+			if (allInboxes.length > 0) {
+				
+				const res = await fetch("/api/get/unreadChatRooms")
+				
+				const { allUnreadChatRooms } = await res.json();
+				setChatRoomsWithUnreadMessages(allUnreadChatRooms);
+			}
+		}
+		getUnreadChatRooms();
+	}, [allInboxes])
+	
+	
 	const [messages, setMessages] = useState<MessageType[]>([]);
+	const [isLoading, setIsLoading] = useState(false);
+	const [lastSeenMessageId, setLastSeenMessageId] = useState("");
 	
 	useEffect(() => {
 		
 		const getMessages = async () => {
+			
+			setIsLoading(true);
 			
 			const res = await fetch(`/api/get/messages/${chatType}`, {
 				method: "POST",
@@ -32,6 +77,7 @@ const ChatInterface = ({ userId }: { userId: string }) => {
 			
 			const data = await res.json();
 			setMessages(data.messages);
+			setIsLoading(false);
 		}
 		
 		if (chatId) {
@@ -45,11 +91,11 @@ const ChatInterface = ({ userId }: { userId: string }) => {
 	
 	
 	
-	let Communication = <SendMessage setMessages={setMessages} />;
+	let Communication = <SendMessage setLastSeenMessageId={setLastSeenMessageId} />;
 	if (role === "OBSERVER") {
 		
 		if (newChatmate) {
-			// 'SendFirstMessage' component is only used for private chats that have 0 messages.
+			// 'SendFirstMessage' component is only used for a private chat that has 0 messages.
 			Communication = <SendFirstMessage />
 		} else {
 			Communication = <JoinChat />
@@ -69,8 +115,11 @@ const ChatInterface = ({ userId }: { userId: string }) => {
 						
 						<Messages
 							messages={messages}
-							userId={userId}
 							setMessages={setMessages}
+							userId={userId}
+							isLoading={isLoading}
+							lastSeenMessageId={lastSeenMessageId}
+							setLastSeenMessageId={setLastSeenMessageId}
 						/>
 						
 						{ Communication }

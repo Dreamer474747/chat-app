@@ -2,6 +2,7 @@ import connectToDB from "db";
 import UserModel from "@/models/User";
 import PrivateModel from "@/models/Private";
 import PrivateMessageModel from "@/models/PrivateMessage";
+import PrivateInboxModel from "@/models/PrivateInbox";
 
 import { isValidObjectId } from "mongoose";
 import { authUser } from "u/serverHelpers";
@@ -55,32 +56,27 @@ export async function POST(req: Request) {
 			const firstMessage = await PrivateMessageModel.create({
 				body: message,
 				sender: user._id,
-				isSeen: true,
+				isSeen: false,
 				private: newPrivateChat._id,
 				createdAt: newPrivateChat.lastMessageDate
 			})
 			
-			const updateUser1 = await UserModel.findOneAndUpdate(
-				{ _id: user._id },
-				{
-					$push: {
-						privates: newPrivateChat._id
-					}
-				}
-			);
+			const userNewInbox = await PrivateInboxModel.create({
+				user: user._id,
+				private: newPrivateChat._id,
+				lastSeenMessage: firstMessage._id
+			})
 			
-			const updateUser2 = await UserModel.findOneAndUpdate(
-				{ _id: newChatmate },
-				{
-					$push: {
-						privates: newPrivateChat._id
-					}
-				}
-			);
+			const chatmateNewInbox = await PrivateInboxModel.create({
+				user: newChatmate,
+				private: newPrivateChat._id,
+				lastSeenMessage: firstMessage._id
+			})
 			
-			const newInbox = await PrivateModel.findOne({ _id: newPrivateChat._id })
+			const newChatRoom = await PrivateModel.findOne({ _id: newPrivateChat._id })
 			.populate("chatmates", "name").lean();
-			return Response.json({ newInbox }, {status: 201});
+			
+			return Response.json({ newChatRoom, userNewInbox }, {status: 201});
 			
 		} else {
 			return Response.json(
@@ -91,7 +87,7 @@ export async function POST(req: Request) {
 		
 		
 	} catch(err) {
-		
+		console.log(err)
 		return Response.json({message: "/create/private api error"},
 		{ status: 500 });
 	}

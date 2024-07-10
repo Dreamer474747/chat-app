@@ -34,8 +34,10 @@ export async function POST(req: Request) {
 			{status: 422});
 		}
 		
-		const messages = await GroupMessageModel.find({ group: chatId }, "-__v -updatedAt -group -isSeen")
-		.populate("sender", "name").lean();
+		const messages = await GroupMessageModel.find(
+			{ group: chatId },
+			"-__v -updatedAt -group"
+		).populate("sender", "name").lean();
 		
 		if (messages) {
 			return Response.json({ messages });

@@ -27,12 +27,6 @@ const schema = new mongoose.Schema({
 	},
 })
 
-schema.virtual("messages", {
-	ref: "PrivateMessage",
-	localField: "_id",
-	foreignField: "private"
-})
-
 
 const model = mongoose.models?.Private || mongoose.model("Private", schema);
 

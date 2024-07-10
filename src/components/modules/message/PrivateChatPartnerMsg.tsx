@@ -1,7 +1,7 @@
-type MessageParamsType = {
-	body: string,
-	createdAt: string
-}
+"use client"
+import { useRef, useEffect, forwardRef } from "react";
+
+import { Tick, DoubleTick } from "m/icons";
 
 type OptionsType = {
 	hour: "2-digit" | "numeric" | undefined,
@@ -9,9 +9,20 @@ type OptionsType = {
 	hour12: boolean,
 }
 
+type MessageParamsType = {
+	body: string,
+	createdAt: string,
+	seen: boolean,
+	id?: string
+}
 
-const PrivateChatPartnerMsg = ({ body, createdAt }: MessageParamsType) => {
-	
+type PrivateChatPartnerMsgProps = MessageParamsType & {
+	ref: React.RefObject<HTMLDivElement>;
+};
+
+
+const PrivateChatPartnerMsg = forwardRef<HTMLDivElement, PrivateChatPartnerMsgProps>(
+	({ body, createdAt, seen, id }, ref) => {
 	
 	const options: OptionsType = {
 		hour: "2-digit",
@@ -20,14 +31,19 @@ const PrivateChatPartnerMsg = ({ body, createdAt }: MessageParamsType) => {
 	}
 	
 	
+	
+	
 	return (
 		<>
 			<div
+				ref={seen ? null : ref}
+				id={id ? id : ""}
 				className="w-full flex justify-start relative mt-2 pl-2"
 			>
             
 				<div
-					className="bg-receivedMessage rounded-[10px] max-w-md py-2 px-4 sm:py-3 sm:px-5"
+					className={`bg-receivedMessage rounded-[10px] max-w-md
+					py-2 px-4 sm:py-3 sm:px-5 relative`}
 				>
 				
 					<p
@@ -35,6 +51,10 @@ const PrivateChatPartnerMsg = ({ body, createdAt }: MessageParamsType) => {
 					>
 						{body}
 					</p>
+					
+					<div className="absolute -bottom-0.5 right-0.5">
+						{ seen ? <DoubleTick /> : <Tick /> }
+					</div>
 				
 				</div>
 
@@ -51,7 +71,7 @@ const PrivateChatPartnerMsg = ({ body, createdAt }: MessageParamsType) => {
 			</p>
 		</>
 	)
-}
+})
 
 
 export default PrivateChatPartnerMsg;

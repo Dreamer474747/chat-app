@@ -1,3 +1,7 @@
+//@ts-nocheck
+// sweetalert has some problems with tsc and thats not an issue thats coming from me.
+// i tried to fix it but i couldn't. hope you can understand that.
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -76,7 +80,6 @@ const Register = ( { showloginForm }: RegisterParams ) => {
 		})
 		
 		const data = await res.json();
-		console.log(data);
 		
 		if (res.status === 201) {
 			setName("");

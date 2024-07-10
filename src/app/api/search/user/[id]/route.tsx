@@ -1,5 +1,6 @@
 import connectToDB from "db";
 import UserModel from "@/models/User";
+import PrivateInboxModel from "@/models/PrivateInbox";
 
 import { authUser } from "u/serverHelpers";
 import { idRegex } from "u/constants";
@@ -17,7 +18,8 @@ export async function GET(req: Request, { params }: ParamsType) {
 		connectToDB();
 		const user = await authUser();
 		if (!user) {
-			return Response.json({ message: "login first, do stuff second" }, { status: 401 });
+			return Response.json({ message: "login first, do stuff second" },
+			{ status: 401 });
 		}
 		
 		const userId = params.id; // userId can be something like "amir2@3" or "Re_Za78"
@@ -55,14 +57,28 @@ export async function GET(req: Request, { params }: ParamsType) {
 		
 		/* read the code of the "/api/search/group/[id]/route.tsx" file first. */
 		
-		// the difference in here is that we dont deal with a chat's id here. we deal with user id.
-		const { privates } = await UserModel.findOne({ _id: user._id }, "privates -_id").populate("privates", "chatmates -_id");
+		// the difference in here is that we dont deal with a chat ids here. we deal with user ids.
+		const userPrivateInboxes = await PrivateInboxModel.find({ user: user._id }, "private -_id")
+		.populate("private" , "chatmates -_id")
 		
-		
-		const currentChatmates = [];
-		for (let i = 0; i < privates.length; i++) {
+		if (!userPrivateInboxes) {
+			return Response.json({ message: "there was a problem, try again" },
+			{ status: 500 });
 			
-			const chatmate = privates[i].chatmates.find((id: string) => JSON.stringify(id) !== JSON.stringify(user._id))
+		} else if (userPrivateInboxes.length === 0) {
+		
+			results = results.sort((a: SearchResult, b: SearchResult) => {
+				return a.id.length - b.id.length
+			})
+			
+			return Response.json({ results: results.slice(0, 3) });
+		}
+		
+		// 'currentChatmates' stores all of the user's chat partners ids.
+		const currentChatmates = [];
+		for (let i = 0; i < userPrivateInboxes.length; i++) {
+			
+			const chatmate = userPrivateInboxes[i].private.chatmates.find((id: string) => JSON.stringify(id) !== JSON.stringify(user._id))
 			currentChatmates.push(chatmate);
 		}
 		
@@ -97,7 +113,7 @@ export async function GET(req: Request, { params }: ParamsType) {
 		
 		
 	} catch(err) {
-		console.log(err)
+		
 		return Response.json({message: "/search/user api error"},
 		{ status: 500 });
 	}

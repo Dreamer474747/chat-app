@@ -11,12 +11,6 @@ createNonRememberedRT
 import { passwordRegex, emailRegex, idRegex } from "u/constants";
 
 
-/*
-	"body": "پیام اول",
-    "sender": "664de5db94cbc6451bc91924",
-    "isSeen": true,
-    "gruop": "665462ae9eb209b92cc33b6e"
-*/
 
 export async function POST(req: Request) {
 	

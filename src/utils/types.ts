@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 import type { Socket } from "socket.io-client";
 
 type chatmate = {
@@ -23,18 +24,40 @@ type GroupType = {
 	admins: string[],
 }
 
-type CurrentChatContextType = {
-	name: string,
-	updateName: (name: string) => void,
-	role: string,
-	updateRole: (role: string) => void,
-	chatId: string,
-	updateChatId: (chatId: string) => void,
-	chatType: string,
-	updateChatType: (chatType: string) => void,
-	newChatmate: string,
-	updateChatmateId: (newChatmateId: string) => void,
+type PrivateInbox = {
+	private: string,
+	lastSeenMessage: string,
 }
+
+type GroupInbox = {
+	group: string,
+	lastSeenMessage: string,
+}
+
+type CurrentChatStatusContextType = {
+	name: string,
+	setName: (name: string) => void,
+	role: string,
+	setRole: (role: string) => void,
+	chatId: string,
+	setChatId: (chatId: string) => void,
+	chatType: string,
+	setChatType: (chatType: string) => void,
+	newChatmate: string,
+	setNewChatmate: (newChatmateId: string) => void,
+}
+
+type AllChatsAndInboxesContextType = {
+	allChatRooms: (GroupType | PrivateType)[],
+	setAllChatRooms: Dispatch<SetStateAction<any>>,
+	allInboxes: (GroupInbox | PrivateInbox)[],
+	setAllInboxes: Dispatch<SetStateAction<any>>,
+	chatRoomsWithUnreadMessages: string[],
+	setChatRoomsWithUnreadMessages: Dispatch<SetStateAction<any>>
+}
+// change the 'any' type later
+// (GroupType | PrivateType)[]
+// (GroupInbox | PrivateInbox)[]
 
 type MessageType = {
 	_id: string,
@@ -44,7 +67,8 @@ type MessageType = {
 		_id: string,
 		name: string
 	} | string,
-	isSystemMessage?: boolean
+	isSystemMessage?: boolean,
+	isSeen: boolean
 }
 
 type WebsocketContextType = {
@@ -60,7 +84,10 @@ type SearchResult = {
 export type {
 GroupType,
 PrivateType,
-CurrentChatContextType,
+PrivateInbox,
+GroupInbox,
+CurrentChatStatusContextType,
+AllChatsAndInboxesContextType,
 MessageType,
 WebsocketContextType,
 SearchResult

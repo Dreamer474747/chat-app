@@ -1,5 +1,5 @@
 import connectToDB from "db";
-import UserModel from "@/models/User";
+import GroupInboxModel from "@/models/GroupInbox";
 import GroupModel from "@/models/Group";
 
 import { authUser } from "u/serverHelpers";
@@ -36,12 +36,13 @@ export async function GET(req: Request, { params }: ParamsType) {
 			return Response.json({message: "invalid data !!"}, {status: 422});
 		}
 		
-		const results = await GroupModel.find({
+		let results = await GroupModel.find({
 			id: { $regex: groupId, $options: 'i' }
 		}, "name id");
 		
 		if (!results) {
-			return Response.json({ message: "there was a problem, try again" }, { status: 500 });
+			return Response.json({ message: "there was a problem, try again" },
+			{ status: 500 });
 			
 		} else if (results.length === 0) {
 			return Response.json({ message: "there is no group id similar to the given id" },
@@ -52,14 +53,36 @@ export async function GET(req: Request, { params }: ParamsType) {
 		a member of example1, but is not a member of example2 and example3. when user searches
 		the 'example' id in the search input, he should only see the example2 and example3 groups.
 		and should not see the example1 group in his search results. */
-		const userGroups = await UserModel.findOne({ _id: user._id }, "groups");
-		// 'userGroups.groups' is an array filled with _ids of user's groups. add
-		// "console.log(userGroups.groups)" here to understand the code better.
+		const userGroupInboxes = await GroupInboxModel.find({ user: user._id }, "group -_id");
+		
+		if (!userGroupInboxes) {
+			return Response.json({ message: "there was a problem, try again" },
+			{ status: 500 });
+			
+		} else if (userGroupInboxes.length === 0) {
+		
+			results = results.sort((a: SearchResult, b: SearchResult) => {
+				return a.id.length - b.id.length
+			})
+			
+			return Response.json({ results: results.slice(0, 3) });
+		}
+		
+		const userGroups = [];
+		for (let i = 0; i < userGroupInboxes.length; i++) {
+			userGroups.push(userGroupInboxes[i].group)
+		}
+		
+		// 'userGroups' is an array filled with _ids of user's groups. add
+		// "console.log(userGroups)" here to understand the code better.
+		
+		
+		
 		
 		let filteredResults = [];
 		for (let i = 0 ; i < results.length; i++) {
 			
-			const isExistInUserGroups = userGroups.groups.some((groupId: string) => JSON.stringify(groupId) === JSON.stringify(results[i]._id));
+			const isExistInUserGroups = userGroups.some((groupId: string) => JSON.stringify(groupId) === JSON.stringify(results[i]._id));
 			
 			if (!isExistInUserGroups) {
 				filteredResults.push(results[i]);
@@ -74,8 +97,8 @@ export async function GET(req: Request, { params }: ParamsType) {
 		}
 		
 		/* every time user searches for an id, we should find all the wanted results, sort them
-		from the search result with least characters to the search result with most characters, and then
-		send the results array that only includes the first 3 items. */
+		from the search result with least characters to the search result with most characters,
+		and then send the results array that only includes the first 3 items. */
 		
 		filteredResults = filteredResults.sort((a: SearchResult, b: SearchResult) => {
 			return a.id.length - b.id.length

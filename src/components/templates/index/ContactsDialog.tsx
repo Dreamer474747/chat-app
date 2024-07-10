@@ -15,13 +15,10 @@ import { X } from "lucide-react"
 
 import type { GroupType, PrivateType } from "u/types";
 
-type ContactsSheetParams = {
-	sortedInboxes: (GroupType | PrivateType)[],
-	userId: string
-}
 
+// (GroupType | PrivateType)[]
 
-const ContactsDialog = ({ sortedInboxes, userId }: ContactsSheetParams) => {
+const ContactsDialog = ({ userId }: { userId: string }) => {
 	
 	const [open, setOpen] = useState(false);
 	
@@ -41,13 +38,16 @@ const ContactsDialog = ({ sortedInboxes, userId }: ContactsSheetParams) => {
 				className="bg-secondary text-white custom-height2 px-0 py-1 mt-0 mb-[6px] ml-2 sm:ml-0 relative"
 			>
 				<Button
-					className="absolute top-2 right-3 z-10 p-3 bg-primary hover:bg-primary-hover"
+					className="absolute bottom-2 right-2 z-10 p-3 bg-primary hover:bg-primary-hover"
 					onClick={() => setOpen(false)}
 				>
 					<X className="h-4 w-4" />
 				</Button>
 				
-				<Contacts sortedInboxes={sortedInboxes} userId={userId} isForDialog={true} />
+				<Contacts
+					userId={userId}
+					isForDialog={true}
+				/>
 			</PopoverContent>
 			
 		</Popover>

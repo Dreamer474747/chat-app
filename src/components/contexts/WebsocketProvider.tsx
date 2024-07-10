@@ -13,7 +13,7 @@ const useSocket = () => {
 	
 	useEffect(() => {
 		
-		const socketIo = io("ws://localhost:5000");
+		const socketIo = io("http://localhost:4000");
 		setSocket(socketIo);
 		
 		const cleanUp = () => {

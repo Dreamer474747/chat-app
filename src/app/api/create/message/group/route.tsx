@@ -2,6 +2,7 @@ import connectToDB from "db";
 import UserModel from "@/models/User";
 import GroupModel from "@/models/Group";
 import GroupMessageModel from "@/models/GroupMessage";
+import GroupInboxModel from "@/models/GroupInbox";
 
 import { isValidObjectId } from "mongoose";
 import { authUser } from "u/serverHelpers";
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
 			{ status: 401 });
 		}
 		
-		const { body, isSystemMessage, chatId: group } = await req.json();
+		const { body, isSystemMessage, chatId: groupId } = await req.json();
 		
 		// isSystemMessage is not a required field.
 		if (isSystemMessage && typeof isSystemMessage !== "boolean") {
@@ -28,19 +29,19 @@ export async function POST(req: Request) {
 			{status: 422});
 		}
 		
-		if (typeof body !== "string" || typeof group !== "string") {
+		if (typeof body !== "string" || typeof groupId !== "string") {
 			
 			return Response.json({message: "invalid data !!"},
 			{status: 422});
 		}
 		
-		if (!body.trim() || !group.trim()) {
+		if (!body.trim() || !groupId.trim()) {
 			return Response.json({message: "invalid data !!"},
 			{status: 422});
 		}
 		
 		
-		const isGroupIdValid = isValidObjectId(group);
+		const isGroupIdValid = isValidObjectId(groupId);
 		
 		if (!isGroupIdValid) {
 			return Response.json({message: "invalid data !!"},
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
 		
 		
 		// does this group conversation exist in our database?
-		const isGroupExist = await GroupModel.findOne({ _id: group }, "_id")
+		const isGroupExist = await GroupModel.findOne({ _id: groupId }, "_id")
 		if (!isGroupExist) {
 			return Response.json({message: "invalid data !!"},
 			{status: 422});
@@ -61,33 +62,40 @@ export async function POST(req: Request) {
 			message = await GroupMessageModel.create({
 				body,
 				sender: user._id,
-				isSeen: true,
+				isSeen: false,
 				isSystemMessage,
-				group
+				group: groupId
 			})
 		} else {
 			
 			message = await GroupMessageModel.create({
 				body,
 				sender: user._id,
-				isSeen: true,
-				group
+				isSeen: false,
+				group: groupId
 			})
 		}
 		
-		// updating the lastMessage field of this group conversation(which the value of its _id is 'group')
-		// to the most recent message that has been sent to this conversation.(which is the 'body')
+		await GroupInboxModel.findOneAndUpdate(
+			{ user: user._id, group: groupId },
+			{ lastSeenMessage: message._id }
+		);
+		
+		// updating the lastMessage field of this group conversation(which the value of its
+		// _id is 'groupId') to the most recent message that has been sent to this conversation
+		// (which is the 'body')
 		await GroupModel.findOneAndUpdate(
-			{ _id: group },
+			{ _id: groupId },
 			{ lastMessage: body, lastMessageDate: message.createdAt }
 		);
 		
-		const userName = await UserModel.findOne({ _id: user._id }, "name _id");
+		const userName = await UserModel.findOne({ _id: user._id }, "name -_id");
 		
 		const lastMessage: MessageType = {
 			_id: message._id,
 			body: message.body,
 			createdAt: message.createdAt,
+			isSeen: false,
 			sender: {
 				_id: message.sender,
 				name: userName.name
@@ -99,7 +107,7 @@ export async function POST(req: Request) {
 			lastMessage.isSystemMessage = true;
 		}
 		
-		return Response.json({lastMessage}, {status: 201});
+		return Response.json({ lastMessage }, {status: 201});
 		
 		
 	} catch(err) {
