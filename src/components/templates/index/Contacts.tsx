@@ -31,7 +31,7 @@ const Contacts = ({ userId, isForDialog }: ContactsParams) => {
 	const { setName, setRole, setChatId, setChatType, chatId
 	} = useContext(CurrentChatStatusContext) as CurrentChatStatusContextType;
 	
-	const { allChatRooms, setAllChatRooms, chatRoomsWithUnreadMessages
+	const { allChatRooms, setAllChatRooms, chatRoomsWithUnreadMessages, setChatRoomsWithUnreadMessages
 	} = useContext(AllChatsAndInboxesContext) as AllChatsAndInboxesContextType;
 	
 	
@@ -45,7 +45,7 @@ const Contacts = ({ userId, isForDialog }: ContactsParams) => {
 	
 	useEffect(() => {
 		
-		const receiveNewMessage = (message: MessageType, roomId: string) => {
+		const receiveNewMessage = async (message: MessageType, roomId: string) => {
 			
 			const updatedChatRooms = allChatRooms.map(chat => {
 				if (chat._id === roomId) {
@@ -64,6 +64,11 @@ const Contacts = ({ userId, isForDialog }: ContactsParams) => {
 			});
 		
 			setAllChatRooms(sortedChatRooms);
+			
+			const res = await fetch("/api/get/unreadChatRooms")
+			
+			const { allUnreadChatRooms } = await res.json();
+			setChatRoomsWithUnreadMessages(allUnreadChatRooms);
 		}
 		
 		
@@ -219,7 +224,7 @@ const Contacts = ({ userId, isForDialog }: ContactsParams) => {
 									
 								</div>
 								{
-									chatRoomsWithUnreadMessages.length > 0 && 
+									chatRoomsWithUnreadMessages?.length > 0 && 
 									chatRoomsWithUnreadMessages.some(chatRoomId => chatRoomId === chat._id ) && (
 										<div className="bg-[#708090] w-2 h-[10px] absolute top-[9px] right-2 rounded-full"></div>
 									)

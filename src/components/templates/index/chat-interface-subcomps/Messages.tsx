@@ -37,13 +37,15 @@ const Messages = ({ userId, messages, setMessages, isLoading, lastSeenMessageId,
 	const { chatId, chatType, role } = useContext(CurrentChatStatusContext) as CurrentChatStatusContextType;
 	const { socket } = useContext(WebsocketContext) as WebsocketContextType;
 	
-	const { allInboxes, setAllInboxes, allChatRooms } = useContext(AllChatsAndInboxesContext) as any;
+	const { allInboxes, setAllInboxes, allChatRooms, setChatRoomsWithUnreadMessages
+	} = useContext(AllChatsAndInboxesContext) as any;
 	
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [goToBottom, setGoToBottom] = useState(true);
 	const [isThereUnseenMessages, setIsThereUnseenMessages] = useState<null | boolean>(null);
 	// here, i needed 3 possible situation.
 	// null = "unset" || true = "there is unseen messages" || false = "there is no unseen messages"
+	const [shouldUnreadMsgsDivBeDisplayed, setShouldUnreadMsgsDivBeDisplayed] = useState(true);
 	
 	const isLastMessage = (messageId: string) => {
 		
@@ -63,28 +65,14 @@ const Messages = ({ userId, messages, setMessages, isLoading, lastSeenMessageId,
 				lastSeenMessageId = allInboxes.find((inbox: any) => inbox.private === chatId).lastSeenMessage as string
 			}
 			setLastSeenMessageId(lastSeenMessageId);
-			
 			setIsScrolled(false);
 		}
 		
-		const receiveMessage = (message: MessageType, roomId: string) => {
-			
-			if (chatId === roomId) {
-				
-				setMessages((prev: MessageType[]) => [...prev, message]);
-			}
-		}
-		
-		
-		if (socket) {
-			socket.on("message", receiveMessage);
-		}
 		
 		return () => {
-			socket?.off("message", receiveMessage);
 			setIsThereUnseenMessages(null);
-		};
-		
+			setShouldUnreadMsgsDivBeDisplayed(true);
+		}
 	}, [chatId])
 	
 	
@@ -112,6 +100,8 @@ const Messages = ({ userId, messages, setMessages, isLoading, lastSeenMessageId,
 	
 	
 	
+	
+	
 	useEffect(() => {
 		
 		if (messages.length > 0) {
@@ -130,6 +120,14 @@ const Messages = ({ userId, messages, setMessages, isLoading, lastSeenMessageId,
 			}
 		}
 		
+		const receiveMessage = async (message: MessageType, roomId: string) => {
+			
+			if (chatId === roomId) {
+				setShouldUnreadMsgsDivBeDisplayed(false);
+				setMessages((prev: MessageType[]) => [...prev, message]);
+				setIsThereUnseenMessages(null);
+			}
+		}
 		
 		const receiveNewSeenMessage = (messageId: string) => {
 			
@@ -140,16 +138,17 @@ const Messages = ({ userId, messages, setMessages, isLoading, lastSeenMessageId,
 					return message;
 				}
 			})
-			console.log(updatedMessages);
 			
 			setMessages(updatedMessages);
 		}
 		
 		if (socket) {
+			socket.on("message", receiveMessage);
 			socket.on("newSeenMessage", receiveNewSeenMessage);
 		}
 		
 		return () => {
+			socket?.off("message", receiveMessage);
 			socket?.off("newSeenMessage", receiveNewSeenMessage);
 		};
 		
@@ -200,7 +199,7 @@ const Messages = ({ userId, messages, setMessages, isLoading, lastSeenMessageId,
 					socket.emit("messageIsSeen", messageId, chatId);
 					
 				} else {
-					showSwal("there was a problem, is you're internet connected?", "error", "ok");
+					// showSwal("there was a problem, is you're internet connected?", "error", "ok");
 				}
 				
 			})
@@ -241,7 +240,7 @@ const Messages = ({ userId, messages, setMessages, isLoading, lastSeenMessageId,
 					>
 						{({ ref }) => (
 						
-							message._id === lastSeenMessageId && !isLastMessage(message._id) ? (
+							message._id === lastSeenMessageId && !isLastMessage(message._id) && shouldUnreadMsgsDivBeDisplayed ? (
 								<>
 									{
 										message.sender === userId ? (
@@ -302,7 +301,7 @@ const Messages = ({ userId, messages, setMessages, isLoading, lastSeenMessageId,
 					>
 						{({ ref }) => (
 						
-							message._id === lastSeenMessageId && !isLastMessage(message._id) ? (
+							message._id === lastSeenMessageId && !isLastMessage(message._id) && shouldUnreadMsgsDivBeDisplayed ? (
 								<>
 									{
 										message.isSystemMessage ? (

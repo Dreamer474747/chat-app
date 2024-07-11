@@ -71,7 +71,6 @@ const SendMessage = ({ setLastSeenMessageId }: SendMessageParams) => {
 			}
 			
 			setLastSeenMessageId(lastMessage._id);
-			
 			setMessage("");
 		
 		} else {

@@ -13,7 +13,7 @@ const useSocket = () => {
 	
 	useEffect(() => {
 		
-		const socketIo = io("http://localhost:4000");
+		const socketIo = io("https://chat-app-websocket-logic.liara.run");
 		setSocket(socketIo);
 		
 		const cleanUp = () => {
